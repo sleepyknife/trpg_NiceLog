@@ -46,7 +46,7 @@
         <nav class="mt-4 sm:mt-0 flex items-center space-x-6">
             <a href="#" class="text-lg font-semibold text-gray-300 hover:text-indigo-400 transition-colors">首頁</a>
             <a href="#archive" class="text-lg font-semibold text-gray-300 hover:text-indigo-400 transition-colors">團錄清單</a>
-            <a href="#" class="text-lg font-semibold text-gray-300 hover:text-indigo-400 transition-colors">關於我們</a>
+            <a href="#" class="text-lg font-semibold text-gray-300 hover:text-indigo-400 transition-colors" id="about-us-btn">關於我們</a>
             <div class="relative hidden sm:block">
                 <input type="text" placeholder="搜尋團錄..." class="pl-10 pr-4 py-2 rounded-full bg-gray-800 text-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all w-48">
                 <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
@@ -124,6 +124,7 @@
     const modalDescription = document.getElementById('modal-description');
     const modalImage = document.getElementById('modal-image');
     const modalCloseBtn = document.getElementById('modal-close-btn');
+    const aboutUsBtn = document.getElementById('about-us-btn');
 
     // 從所有資料中隨機挑選 n 個項目作為輪播資料
     function getRandomCarouselData(data, count) {
@@ -232,6 +233,19 @@
         modal.classList.remove('hidden');
     }
 
+    // 顯示「關於我們」對話框
+    function showAboutUsModal() {
+        const aboutUsContent = {
+            title: "關於我們：團錄冒險",
+            description: "我們是一群熱愛TRPG的玩家，致力於將每一次精彩的冒險、動人的故事和爆笑的瞬間記錄下來，並與更多同好分享。我們相信，TRPG不僅僅是個遊戲，更是一場集體創作的藝術。希望這個網站能成為你尋找下一個冒險、或是分享你自己的故事的溫馨角落。\n\n如果你對我們的網站有任何建議，或者想分享你的團錄，歡迎隨時聯繫我們！",
+            image: "about-us.jpg"
+        };
+        modalTitle.textContent = aboutUsContent.title;
+        modalDescription.textContent = aboutUsContent.description;
+        modalImage.style.backgroundImage = `url('/img/${aboutUsContent.image}')`;
+        modal.classList.remove('hidden');
+    }
+
     // 隱藏對話框
     function hideModal() {
         modal.classList.add('hidden');
@@ -245,10 +259,16 @@
         }
     });
 
+    // 綁定「關於我們」按鈕事件
+    aboutUsBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        showAboutUsModal();
+    });
+
     // 載入 JSON 資料並初始化頁面
     document.addEventListener('DOMContentLoaded', async () => {
         try {
-            const response = await fetch('/lib/data.json');
+            const response = await fetch('lib/data.json');
             if (!response.ok) {
                 throw new Error('Failed to load data.json');
             }
