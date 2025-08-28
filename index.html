@@ -2,8 +2,10 @@
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
+    <link rel="shortcut icon" href="img/favicon-16x16.png" type="img/x-icon">
+    <link rel="icon" href="img/favicon-16x16.png" type="image/x-icon" / >
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TRPG 團錄分享 - 奇幻冒險</title>
+    <title>說書人的爐邊夜話</title>
     <!-- 引入 Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -59,8 +61,8 @@
 <header class="bg-gray-900 shadow-lg fixed w-full top-0 z-50">
     <div class="container mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center">
         <div class="flex items-center space-x-4">
-            <i class="fas fa-dice-d20 text-indigo-500 text-3xl"></i>
-            <span class="text-3xl font-bold text-gray-100">團錄冒險</span>
+            <img src="img/favicon-32x32.png" alt="網站Logo" class="w-8 h-8">
+            <span class="text-3xl font-bold text-gray-100">說書人的爐邊夜話</span>
         </div>
         <nav class="mt-4 sm:mt-0 flex items-center space-x-6">
             <a href="#" class="text-lg font-semibold text-gray-300 hover:text-indigo-400 transition-colors">首頁</a>
@@ -77,6 +79,25 @@
 </header>
 
 <main class="pt-24 pb-8">
+    <!-- 網站介紹區塊 -->
+    <section class="container mx-auto px-4 py-8 mb-12 text-center">
+        <h1 class="text-4xl md:text-5xl font-extrabold text-gray-100 mb-4">
+            說書人的爐邊夜話
+        </h1>
+        <p class="text-base md:text-lg text-gray-400 max-w-3xl mx-auto">
+            歡迎來到說書人的爐邊夜話。
+        </p>
+        <p class="text-base md:text-lg text-gray-400 max-w-3xl mx-auto">
+            爐火已點燃，讓我們拿起麥酒，坐下來分享每一場冒險的真實故事。
+        </p>
+        <p class="text-base md:text-lg text-gray-400 max-w-3xl mx-auto">
+            從擊敗巨龍的英勇史詩，到全軍覆沒的爆笑插曲。
+        </p>
+        <p class="text-base md:text-lg text-gray-400 max-w-3xl mx-auto">
+            在這裡，每一個玩家都是說書人，每一段回憶都值得被珍藏。
+        </p>
+    </section>
+
     <!-- 輪播區塊 (Hero Section) -->
     <section class="container mx-auto px-4 mb-16">
         <div id="carousel" class="relative overflow-hidden rounded-3xl shadow-2xl h-[400px] md:h-[500px] lg:h-[600px] transition-all duration-500">
@@ -89,7 +110,7 @@
 
     <!-- 熱門與最新團錄區塊 (卡片清單) -->
     <section id="archive" class="container mx-auto px-4">
-        <h2 class="text-4xl font-bold text-center text-gray-100 mb-12">探索更多冒險</h2>
+        <h2 class="text-4xl font-bold text-center text-gray-100 mb-12">探索更多故事</h2>
         
         <!-- 篩選器與排序 (未實作完整功能，僅為UI) -->
         <div class="flex flex-wrap justify-center sm:justify-end items-center mb-8 gap-4">
@@ -127,7 +148,7 @@
 
 <footer class="bg-gray-900 mt-16 py-8">
     <div class="container mx-auto px-4 text-center text-gray-500">
-        &copy; 2024 TRPG 團錄分享。保留所有權利。
+        &copy; 2024 說書人的爐邊夜話。保留所有權利。
     </div>
 </footer>
 
@@ -301,8 +322,8 @@
     // 顯示「關於我們」對話框
     function showAboutUsModal() {
         const aboutUsContent = {
-            title: "關於我們：團錄冒險",
-            description: "我們是一群熱愛TRPG的玩家，致力於將每一次精彩的冒險、動人的故事和爆笑的瞬間記錄下來，並與更多同好分享。我們相信，TRPG不僅僅是個遊戲，更是一場集體創作的藝術。希望這個網站能成為你尋找下一個冒險、或是分享你自己的故事的溫馨角落。\n\n如果你對我們的網站有任何建議，或者想分享你的團錄，歡迎隨時聯繫我們！",
+            title: "關於我們：說書人的爐邊夜話",
+            description: "這裡不僅是一個網站，更是你冒險旅程的終點，也是下一個故事的起點。\n\n我們相信 TRPG 的核心是「人」與「故事」。說書人的爐邊夜話是一個社群，一個讓所有說書人能分享、交流、啟發彼此的地方。\n\n無論你是身經百戰的老團長，還是剛踏入冒險的新手，在這裡，你的每一個故事都將成為我們共同的傳說。我們一起笑，一起感嘆，一起創造屬於我們的史詩。",
             image: "dicecat_introduction.png"
         };
         modalTitle.textContent = aboutUsContent.title;
