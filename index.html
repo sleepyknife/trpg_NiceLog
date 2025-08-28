@@ -400,7 +400,9 @@
             const quoteMatch = item.quote.toLowerCase().includes(searchTerm);
             const descriptionMatch = item.description.toLowerCase().includes(searchTerm);
             const tagsMatch = item.tags.some(tag => tag.toLowerCase().includes(searchTerm));
-            return titleMatch || quoteMatch || descriptionMatch || tagsMatch;
+            const systemMatch = (item.system || '').toLowerCase().includes(searchTerm);
+            const systemRawMatch = (item.system_raw || '').toLowerCase().includes(searchTerm);
+            return titleMatch || quoteMatch || descriptionMatch || tagsMatch || systemMatch || systemRawMatch;
         });
         renderCards(filteredData);
         updateSearchResultsList(filteredData, searchTerm);
@@ -425,12 +427,25 @@
         if (searchTerm.length > 0 && data.length > 0) {
             data.slice(0, 5).forEach(item => { // 僅顯示前5個結果
                 const listItem = document.createElement('div');
-                listItem.classList.add('px-4', 'py-2', 'cursor-pointer', 'hover:bg-gray-700', 'truncate');
-                listItem.textContent = item.title;
+                listItem.classList.add('px-4', 'py-3', 'cursor-pointer', 'hover:bg-gray-700', 'border-b', 'border-gray-700');
+
+                const titleHtml = `<div class="font-bold text-base text-gray-100 truncate">${item.title}</div>`;
+                const metaHtml = `
+                    <div class="text-xs text-gray-400 mt-1">
+                        <span><i class="fas fa-book-open w-4 mr-1 text-indigo-400"></i>${item.system || ''}</span>
+                        <span class="ml-2"><i class="fas fa-user-tie w-4 mr-1 text-indigo-400"></i>${item.master || ''}</span>
+                    </div>
+                `;
+                const tagsHtml = `<div class="text-xs text-gray-500 mt-1 truncate">Tags: ${item.tags.join(', ')}</div>`;
+
+                listItem.innerHTML = titleHtml + metaHtml + tagsHtml;
+
                 listItem.addEventListener('click', () => {
                     searchInput.value = item.title;
                     renderCards([item]);
                     searchResultsList.classList.add('hidden');
+                    // 新增: 點擊後將頁面捲動到卡片區
+                    document.getElementById('archive').scrollIntoView({ behavior: 'smooth' });
                 });
                 searchResultsList.appendChild(listItem);
             });
