@@ -64,17 +64,19 @@
             <img src="img/favicon-32x32.png" alt="網站Logo" class="w-8 h-8">
             <span class="text-3xl font-bold text-gray-100">說書人的爐邊夜話</span>
         </div>
-        <nav class="mt-4 sm:mt-0 flex items-center space-x-6">
-            <a href="#" class="text-lg font-semibold text-gray-300 hover:text-indigo-400 transition-colors">首頁</a>
-            <a href="#archive" class="text-lg font-semibold text-gray-300 hover:text-indigo-400 transition-colors">團錄清單</a>
-            <a href="#" class="text-lg font-semibold text-gray-300 hover:text-indigo-400 transition-colors" id="about-us-btn">關於我們</a>
-            <div class="relative hidden sm:block">
+        <div class="flex items-center mt-4 sm:mt-0">
+            <div class="relative hidden sm:block mr-6">
                 <input type="text" placeholder="搜尋團錄..." class="pl-10 pr-4 py-2 rounded-full bg-gray-800 text-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all w-48" id="search-input">
                 <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
                 <!-- Search Suggestion List -->
                 <div id="search-results-list" class="absolute top-full left-0 mt-2 w-full max-h-60 overflow-y-auto bg-gray-800 rounded-lg shadow-xl hidden"></div>
             </div>
-        </nav>
+            <nav class="flex items-center space-x-6">
+                <a href="#" class="text-lg font-semibold text-gray-300 hover:text-indigo-400 transition-colors">首頁</a>
+                <a href="#archive" class="text-lg font-semibold text-gray-300 hover:text-indigo-400 transition-colors">團錄清單</a>
+                <a href="#" class="text-lg font-semibold text-gray-300 hover:text-indigo-400 transition-colors" id="about-us-btn">關於我們</a>
+            </nav>
+        </div>
     </div>
 </header>
 
@@ -312,12 +314,18 @@
             
             const tagsHtml = item.tags.map(tag => `<span class="bg-gray-700 text-gray-400 text-xs font-semibold px-2 py-1 rounded-full">${tag}</span>`).join('');
             
+            const quoteText = item.quote.length > 20 ? item.quote.substring(0, 20) + '...' : item.quote;
+
             card.innerHTML = `
                 <div class="w-full h-48 bg-gray-700" style="background-image: url('/img/${item.image}'); background-size: cover; background-position: center;"></div>
                 <div class="p-6">
                     <div class="flex flex-wrap gap-2 mb-3">${tagsHtml}</div>
                     <h3 class="text-xl font-bold text-gray-100 mb-2 truncate">${item.title}</h3>
-                    <p class="text-sm text-gray-400 line-clamp-2 quote-content">${item.quote}</p>
+                    <div class="text-sm text-gray-400 mb-2">
+                        <p><strong>系統:</strong> ${item.system || '未提供'}</p>
+                        <p><strong>原文:</strong> ${item.system_raw || '未提供'}</p>
+                    </div>
+                    <p class="text-sm text-gray-500 italic quote-content">"${quoteText}"</p>
                 </div>
             `;
             cardGrid.appendChild(card);
