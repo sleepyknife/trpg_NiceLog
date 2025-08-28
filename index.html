@@ -67,8 +67,10 @@
             <a href="#archive" class="text-lg font-semibold text-gray-300 hover:text-indigo-400 transition-colors">團錄清單</a>
             <a href="#" class="text-lg font-semibold text-gray-300 hover:text-indigo-400 transition-colors" id="about-us-btn">關於我們</a>
             <div class="relative hidden sm:block">
-                <input type="text" placeholder="搜尋團錄..." class="pl-10 pr-4 py-2 rounded-full bg-gray-800 text-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all w-48">
+                <input type="text" placeholder="搜尋團錄..." class="pl-10 pr-4 py-2 rounded-full bg-gray-800 text-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all w-48" id="search-input">
                 <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                <!-- Search Suggestion List -->
+                <div id="search-results-list" class="absolute top-full left-0 mt-2 w-full max-h-60 overflow-y-auto bg-gray-800 rounded-lg shadow-xl hidden"></div>
             </div>
         </nav>
     </div>
@@ -133,6 +135,8 @@
     // 輪播區塊相關
     const carousel = document.getElementById('carousel');
     const carouselDots = document.getElementById('carousel-dots');
+    const searchInput = document.getElementById('search-input');
+    const searchResultsList = document.getElementById('search-results-list');
     let currentIndex = 0;
     let intervalId;
     let trpgData = []; // 存放從 JSON 讀取的資料
@@ -255,9 +259,15 @@
     const cardGrid = document.getElementById('card-grid');
 
     // 渲染卡片，並增加點擊展開功能
-    function renderCards() {
+    function renderCards(dataToRender) {
         cardGrid.innerHTML = '';
-        trpgData.forEach(item => {
+        const data = dataToRender || trpgData;
+        
+        if (data.length === 0) {
+            cardGrid.innerHTML = '<p class="text-gray-400 text-center col-span-full">沒有找到相關團錄。</p>';
+        }
+
+        data.forEach(item => {
             const card = document.createElement('div');
             card.classList.add('bg-gray-800', 'rounded-3xl', 'overflow-hidden', 'shadow-xl', 'card-glow-hover', 'cursor-pointer');
             
@@ -319,6 +329,54 @@
         e.preventDefault();
         showAboutUsModal();
     });
+
+    // 綁定搜尋輸入事件
+    searchInput.addEventListener('input', (e) => {
+        const searchTerm = e.target.value.toLowerCase();
+        const filteredData = trpgData.filter(item => {
+            const titleMatch = item.title.toLowerCase().includes(searchTerm);
+            const quoteMatch = item.quote.toLowerCase().includes(searchTerm);
+            const descriptionMatch = item.description.toLowerCase().includes(searchTerm);
+            const tagsMatch = item.tags.some(tag => tag.toLowerCase().includes(searchTerm));
+            return titleMatch || quoteMatch || descriptionMatch || tagsMatch;
+        });
+        renderCards(filteredData);
+        updateSearchResultsList(filteredData, searchTerm);
+
+        // 新增：如果搜尋有結果，自動捲動到卡片清單
+        if (filteredData.length > 0 && searchTerm.length > 0) {
+            document.getElementById('archive').scrollIntoView({ behavior: 'smooth' });
+        }
+    });
+
+    // 綁定點擊頁面其他地方時隱藏搜尋建議
+    document.addEventListener('click', (e) => {
+        if (!searchInput.parentElement.contains(e.target)) {
+            searchResultsList.classList.add('hidden');
+        }
+    });
+    
+    // 渲染搜尋建議清單
+    function updateSearchResultsList(data, searchTerm) {
+        searchResultsList.innerHTML = '';
+
+        if (searchTerm.length > 0 && data.length > 0) {
+            data.slice(0, 5).forEach(item => { // 僅顯示前5個結果
+                const listItem = document.createElement('div');
+                listItem.classList.add('px-4', 'py-2', 'cursor-pointer', 'hover:bg-gray-700', 'truncate');
+                listItem.textContent = item.title;
+                listItem.addEventListener('click', () => {
+                    searchInput.value = item.title;
+                    renderCards([item]);
+                    searchResultsList.classList.add('hidden');
+                });
+                searchResultsList.appendChild(listItem);
+            });
+            searchResultsList.classList.remove('hidden');
+        } else {
+            searchResultsList.classList.add('hidden');
+        }
+    }
 
     // 載入 JSON 資料並初始化頁面
     document.addEventListener('DOMContentLoaded', async () => {
