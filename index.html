@@ -139,8 +139,24 @@
         <!-- 對話框內容 -->
         <div class="overflow-y-auto scroll-container p-6 md:p-10">
             <div id="modal-image" class="w-full h-48 bg-gray-700 rounded-2xl mb-6" style="background-size: cover; background-position: center;"></div>
-            <h3 id="modal-title" class="text-3xl md:text-4xl font-bold text-gray-100 mb-4"></h3>
-            <p id="modal-description" class="text-base md:text-lg text-gray-400 leading-relaxed"></p>
+            <h3 id="modal-title" class="text-3xl md:text-4xl font-bold text-gray-100 mb-2"></h3>
+
+            <!-- 資訊欄 -->
+            <div id="modal-meta" class="text-sm text-gray-400 mb-4 space-y-1">
+                <!-- 內容由 JS 動態生成 -->
+            </div>
+
+            <!-- 標籤欄 -->
+            <div id="modal-tags" class="flex flex-wrap gap-2 mb-6">
+                <!-- 內容由 JS 動態生成 -->
+            </div>
+
+            <hr class="border-gray-600 mb-6">
+
+            <!-- 描述內容 -->
+            <div id="modal-description" class="text-base text-gray-300 leading-relaxed prose prose-invert max-w-none">
+                <!-- 內容由 JS 動態生成 -->
+            </div>
         </div>
     </div>
 </div>
@@ -169,6 +185,8 @@
     const modalTitle = document.getElementById('modal-title');
     const modalDescription = document.getElementById('modal-description');
     const modalImage = document.getElementById('modal-image');
+    const modalMeta = document.getElementById('modal-meta');
+    const modalTags = document.getElementById('modal-tags');
     const modalCloseBtn = document.getElementById('modal-close-btn');
     const aboutUsBtn = document.getElementById('about-us-btn');
 
@@ -313,9 +331,27 @@
 
     // 顯示對話框並填入內容
     function showModal(item) {
+        // 基本資訊
         modalTitle.textContent = item.title;
-        modalDescription.textContent = item.description;
         modalImage.style.backgroundImage = `url('img/${item.image}')`;
+
+        // Meta 資訊
+        modalMeta.innerHTML = `
+            <div><i class="fas fa-book-open w-4 mr-2 text-indigo-400"></i><strong>系統:</strong> ${item.system || '未提供'}</div>
+            <div><i class="fas fa-user-tie w-4 mr-2 text-indigo-400"></i><strong>主持人:</strong> ${item.master || '未提供'}</div>
+            <div><i class="fas fa-calendar-alt w-4 mr-2 text-indigo-400"></i><strong>時間:</strong> ${item.eventtime || '未提供'}</div>
+        `;
+
+        // 標籤
+        modalTags.innerHTML = ''; // 清空舊標籤
+        if (item.tags && item.tags.length > 0) {
+            const tagsHtml = item.tags.map(tag => `<span class="bg-gray-700 text-gray-300 text-xs font-semibold px-3 py-1 rounded-full">${tag}</span>`).join('');
+            modalTags.innerHTML = tagsHtml;
+        }
+
+        // 描述
+        modalDescription.innerHTML = item.description;
+
         modal.classList.remove('hidden');
     }
 
@@ -323,11 +359,15 @@
     function showAboutUsModal() {
         const aboutUsContent = {
             title: "關於我們：說書人的爐邊夜話",
-            description: "這裡不僅是一個網站，更是你冒險旅程的終點，也是下一個故事的起點。\n\n我們相信 TRPG 的核心是「人」與「故事」。說書人的爐邊夜話是一個社群，一個讓所有說書人能分享、交流、啟發彼此的地方。\n\n無論你是身經百戰的老團長，還是剛踏入冒險的新手，在這裡，你的每一個故事都將成為我們共同的傳說。我們一起笑，一起感嘆，一起創造屬於我們的史詩。",
+            description: `
+                <p>這裡不僅是一個網站，更是你冒險旅程的終點，也是下一個故事的起點。</p>
+                <p>我們相信 TRPG 的核心是「人」與「故事」。說書人的爐邊夜話是一個社群，一個讓所有說書人能分享、交流、啟發彼此的地方。</p>
+                <p>無論你是身經百戰的老團長，還是剛踏入冒險的新手，在這裡，你的每一個故事都將成為我們共同的傳說。我們一起笑，一起感嘆，一起創造屬於我們的史詩。</p>
+            `,
             image: "dicecat_introduction.png"
         };
         modalTitle.textContent = aboutUsContent.title;
-        modalDescription.textContent = aboutUsContent.description;
+        modalDescription.innerHTML = aboutUsContent.description; // 優化：使用 innerHTML 並改為 HTML 內容
         modalImage.style.backgroundImage = `url('img/${aboutUsContent.image}')`;
         modal.classList.remove('hidden');
     }
