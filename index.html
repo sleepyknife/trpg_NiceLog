@@ -338,7 +338,7 @@
 
         // Meta 資訊
         modalMeta.innerHTML = `
-            <div><i class="fas fa-book-open w-4 mr-2 text-indigo-400"></i><strong>系統:</strong> ${item.system || '未提供'}</div>
+            <div><i class="fas fa-book-open w-4 mr-2 text-indigo-400"></i><strong>系統:</strong> ${item.system || '未提供'} <span class="text-gray-500">(${item.system_raw || ''})</span></div>
             <div><i class="fas fa-user-tie w-4 mr-2 text-indigo-400"></i><strong>主持人:</strong> ${item.master || '未提供'}</div>
             <div><i class="fas fa-calendar-alt w-4 mr-2 text-indigo-400"></i><strong>時間:</strong> ${item.eventtime || '未提供'}</div>
         `;

@@ -6,6 +6,7 @@
     "image": "carousel-1.jpg",
     "tags": ["克蘇魯", "恐怖", "懸疑", "完結"],
     "system": "克蘇魯的呼喚 7版",
+    "system_raw": "Call of Cthulhu 7th Edition",
     "eventtime": "2023-10-26",
     "master": "老貓"
   },
@@ -16,6 +17,7 @@
     "image": "carousel-2.jpg",
     "tags": ["D&D", "奇幻", "冒險", "進行中"],
     "system": "龍與地下城 5E",
+    "system_raw": "Dungeons & Dragons 5E",
     "eventtime": "2024-01-15",
     "master": "神秘客"
   },
@@ -26,6 +28,7 @@
     "image": "carousel-3.jpg",
     "tags": ["邪神物語", "驚悚", "末日", "完結"],
     "system": "自創規則",
+    "system_raw": "Original Rules",
     "eventtime": "2023-11-30",
     "master": "黑袍"
   },
@@ -36,6 +39,7 @@
     "image": "card-1.jpg",
     "tags": ["科幻", "生存", "完結"],
     "system": "GURPS",
+    "system_raw": "GURPS",
     "eventtime": "2023-05-20",
     "master": "指揮官"
   },
@@ -46,6 +50,7 @@
     "image": "card-2.jpg",
     "tags": ["奇幻", "冒險", "進行中"],
     "system": "Pathfinder 2E",
+    "system_raw": "Pathfinder 2E",
     "eventtime": "2024-03-10",
     "master": "艾莉"
   },
@@ -56,6 +61,7 @@
     "image": "card-3.jpg",
     "tags": ["懸疑", "推理", "完結"],
     "system": "Gumshoe",
+    "system_raw": "Gumshoe System",
     "eventtime": "2023-08-01",
     "master": "偵探J"
   },
@@ -66,6 +72,7 @@
     "image": "card-4.jpg",
     "tags": ["搞笑", "日常", "進行中"],
     "system": "FATE",
+    "system_raw": "FATE Core System",
     "eventtime": "2024-02-28",
     "master": "遊戲之神"
   },
@@ -76,6 +83,7 @@
     "image": "card-5.jpg",
     "tags": ["科幻", "賽博龐克", "完結"],
     "system": "Cyberpunk RED",
+    "system_raw": "Cyberpunk RED",
     "eventtime": "2023-12-12",
     "master": "影子"
   },
@@ -86,6 +94,7 @@
     "image": "card-6.jpg",
     "tags": ["奇幻", "冒險", "完結"],
     "system": "D&D 3.5E",
+    "system_raw": "Dungeons & Dragons 3.5E",
     "eventtime": "2022-07-21",
     "master": "古書管理員"
   },
@@ -96,6 +105,7 @@
     "image": "card-7.jpg",
     "tags": ["驚悚", "調查", "進行中"],
     "system": "黑暗世界",
+    "system_raw": "World of Darkness",
     "eventtime": "2024-04-01",
     "master": "說書人"
   },
@@ -106,6 +116,7 @@
     "image": "card-8.jpg",
     "tags": ["搞笑", "冒險", "完結"],
     "system": "全員鬼抓人",
+    "system_raw": "Everyone is It",
     "eventtime": "2023-09-15",
     "master": "小丑"
   }
