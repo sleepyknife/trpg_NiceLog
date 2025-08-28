@@ -314,7 +314,7 @@
     // 顯示對話框並填入內容
     function showModal(item) {
         modalTitle.textContent = item.title;
-        modalDescription.textContent = item.description;
+        modalDescription.innerHTML = item.description; // 優化：使用 innerHTML 以支援 HTML 標籤
         modalImage.style.backgroundImage = `url('img/${item.image}')`;
         modal.classList.remove('hidden');
     }
@@ -323,11 +323,15 @@
     function showAboutUsModal() {
         const aboutUsContent = {
             title: "關於我們：說書人的爐邊夜話",
-            description: "這裡不僅是一個網站，更是你冒險旅程的終點，也是下一個故事的起點。\n\n我們相信 TRPG 的核心是「人」與「故事」。說書人的爐邊夜話是一個社群，一個讓所有說書人能分享、交流、啟發彼此的地方。\n\n無論你是身經百戰的老團長，還是剛踏入冒險的新手，在這裡，你的每一個故事都將成為我們共同的傳說。我們一起笑，一起感嘆，一起創造屬於我們的史詩。",
+            description: `
+                <p>這裡不僅是一個網站，更是你冒險旅程的終點，也是下一個故事的起點。</p>
+                <p>我們相信 TRPG 的核心是「人」與「故事」。說書人的爐邊夜話是一個社群，一個讓所有說書人能分享、交流、啟發彼此的地方。</p>
+                <p>無論你是身經百戰的老團長，還是剛踏入冒險的新手，在這裡，你的每一個故事都將成為我們共同的傳說。我們一起笑，一起感嘆，一起創造屬於我們的史詩。</p>
+            `,
             image: "dicecat_introduction.png"
         };
         modalTitle.textContent = aboutUsContent.title;
-        modalDescription.textContent = aboutUsContent.description;
+        modalDescription.innerHTML = aboutUsContent.description; // 優化：使用 innerHTML 並改為 HTML 內容
         modalImage.style.backgroundImage = `url('img/${aboutUsContent.image}')`;
         modal.classList.remove('hidden');
     }
