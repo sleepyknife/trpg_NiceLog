@@ -139,8 +139,24 @@
         <!-- 對話框內容 -->
         <div class="overflow-y-auto scroll-container p-6 md:p-10">
             <div id="modal-image" class="w-full h-48 bg-gray-700 rounded-2xl mb-6" style="background-size: cover; background-position: center;"></div>
-            <h3 id="modal-title" class="text-3xl md:text-4xl font-bold text-gray-100 mb-4"></h3>
-            <p id="modal-description" class="text-base md:text-lg text-gray-400 leading-relaxed"></p>
+            <h3 id="modal-title" class="text-3xl md:text-4xl font-bold text-gray-100 mb-2"></h3>
+
+            <!-- 資訊欄 -->
+            <div id="modal-meta" class="text-sm text-gray-400 mb-4 space-y-1">
+                <!-- 內容由 JS 動態生成 -->
+            </div>
+
+            <!-- 標籤欄 -->
+            <div id="modal-tags" class="flex flex-wrap gap-2 mb-6">
+                <!-- 內容由 JS 動態生成 -->
+            </div>
+
+            <hr class="border-gray-600 mb-6">
+
+            <!-- 描述內容 -->
+            <div id="modal-description" class="text-base text-gray-300 leading-relaxed prose prose-invert max-w-none">
+                <!-- 內容由 JS 動態生成 -->
+            </div>
         </div>
     </div>
 </div>
@@ -169,6 +185,8 @@
     const modalTitle = document.getElementById('modal-title');
     const modalDescription = document.getElementById('modal-description');
     const modalImage = document.getElementById('modal-image');
+    const modalMeta = document.getElementById('modal-meta');
+    const modalTags = document.getElementById('modal-tags');
     const modalCloseBtn = document.getElementById('modal-close-btn');
     const aboutUsBtn = document.getElementById('about-us-btn');
 
@@ -313,9 +331,28 @@
 
     // 顯示對話框並填入內容
     function showModal(item) {
+        // 基本資訊
         modalTitle.textContent = item.title;
-        modalDescription.innerHTML = item.description; // 優化：使用 innerHTML 以支援 HTML 標籤
+
         modalImage.style.backgroundImage = `url('img/${item.image}')`;
+
+        // Meta 資訊
+        modalMeta.innerHTML = `
+            <div><i class="fas fa-book-open w-4 mr-2 text-indigo-400"></i><strong>系統:</strong> ${item.system || '未提供'}</div>
+            <div><i class="fas fa-user-tie w-4 mr-2 text-indigo-400"></i><strong>主持人:</strong> ${item.master || '未提供'}</div>
+            <div><i class="fas fa-calendar-alt w-4 mr-2 text-indigo-400"></i><strong>時間:</strong> ${item.eventtime || '未提供'}</div>
+        `;
+
+        // 標籤
+        modalTags.innerHTML = ''; // 清空舊標籤
+        if (item.tags && item.tags.length > 0) {
+            const tagsHtml = item.tags.map(tag => `<span class="bg-gray-700 text-gray-300 text-xs font-semibold px-3 py-1 rounded-full">${tag}</span>`).join('');
+            modalTags.innerHTML = tagsHtml;
+        }
+
+        // 描述
+        modalDescription.innerHTML = item.description;
+
         modal.classList.remove('hidden');
     }
 
