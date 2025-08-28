@@ -53,28 +53,47 @@
         .carousel-item.slide-in-left {
             transform: translateX(100%);
         }
+
+        /* 搜尋優化 */
+        @media (max-width: 639px) {
+            #header.search-active #logo-title-container {
+                display: none;
+            }
+            #header.search-active #search-container {
+                flex-grow: 1;
+            }
+            #header.search-active #main-nav {
+                display: none;
+            }
+            #header:not(.search-active) #search-cancel-btn {
+                display: none;
+            }
+        }
     </style>
 </head>
 <body class="bg-gray-950 text-gray-200">
 
 <!-- 頂部導覽列 (Header) -->
-<header class="bg-gray-900 shadow-lg fixed w-full top-0 z-50">
-    <div class="container mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center">
-        <div class="flex items-center space-x-4">
+<header id="header" class="bg-gray-900 shadow-lg fixed w-full top-0 z-50">
+    <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+        <div id="logo-title-container" class="flex items-center space-x-4 flex-shrink-0">
             <img src="img/favicon-32x32.png" alt="網站Logo" class="w-8 h-8">
-            <span class="text-3xl font-bold text-gray-100">說書人的爐邊夜話</span>
+            <span class="hidden sm:inline text-3xl font-bold text-gray-100">說書人的爐邊夜話</span>
         </div>
-        <div class="flex items-center mt-4 sm:mt-0">
-            <div class="relative hidden sm:block mr-6">
-                <input type="text" placeholder="搜尋團錄..." class="pl-10 pr-4 py-2 rounded-full bg-gray-800 text-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all w-48" id="search-input">
+        <div class="flex items-center justify-end flex-grow">
+            <div id="search-container" class="relative mr-2 sm:mr-6">
+                <input type="text" placeholder="搜尋..." class="pl-10 pr-10 py-2 rounded-full bg-gray-800 text-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all w-full" id="search-input">
                 <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                <button id="search-cancel-btn" class="hidden sm:hidden absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white">
+                    <i class="fas fa-times-circle"></i>
+                </button>
                 <!-- Search Suggestion List -->
-                <div id="search-results-list" class="absolute top-full left-0 mt-2 w-full max-h-60 overflow-y-auto bg-gray-800 rounded-lg shadow-xl hidden"></div>
+                <div id="search-results-list" class="absolute top-full right-0 mt-2 w-[300px] sm:w-[500px] max-h-[70vh] overflow-y-auto bg-gray-800 rounded-lg shadow-xl hidden"></div>
             </div>
-            <nav class="flex items-center space-x-6">
-                <a href="#" class="text-lg font-semibold text-gray-300 hover:text-indigo-400 transition-colors">首頁</a>
-                <a href="#archive" class="text-lg font-semibold text-gray-300 hover:text-indigo-400 transition-colors">團錄清單</a>
-                <a href="#" class="text-lg font-semibold text-gray-300 hover:text-indigo-400 transition-colors" id="about-us-btn">關於我們</a>
+            <nav id="main-nav" class="flex items-center space-x-6">
+                <a href="#" class="hidden sm:block text-lg font-semibold text-gray-300 hover:text-indigo-400 transition-colors">首頁</a>
+                <a href="#archive" class="hidden sm:block text-lg font-semibold text-gray-300 hover:text-indigo-400 transition-colors">團錄清單</a>
+                <a href="#" class="hidden sm:block text-lg font-semibold text-gray-300 hover:text-indigo-400 transition-colors" id="about-us-btn">關於我們</a>
             </nav>
         </div>
     </div>
@@ -176,6 +195,9 @@
     const carouselDots = document.getElementById('carousel-dots');
     const searchInput = document.getElementById('search-input');
     const searchResultsList = document.getElementById('search-results-list');
+    const header = document.getElementById('header');
+    const searchContainer = document.getElementById('search-container');
+    const searchCancelBtn = document.getElementById('search-cancel-btn');
     let currentIndex = 0;
     let intervalId;
     let trpgData = []; // 存放從 JSON 讀取的資料
@@ -400,6 +422,25 @@
         showAboutUsModal();
     });
 
+    // --- 搜尋啟用/停用邏輯 ---
+    function activateSearch() {
+        if (window.innerWidth < 640) {
+            header.classList.add('search-active');
+            searchCancelBtn.classList.remove('hidden');
+        }
+    }
+
+    function deactivateSearch() {
+        header.classList.remove('search-active');
+        searchCancelBtn.classList.add('hidden');
+        searchInput.value = '';
+        searchResultsList.classList.add('hidden');
+    }
+
+    searchInput.addEventListener('focus', activateSearch);
+
+    searchCancelBtn.addEventListener('click', deactivateSearch);
+
     // 綁定搜尋輸入事件
     searchInput.addEventListener('input', (e) => {
         const searchTerm = e.target.value.toLowerCase();
@@ -421,10 +462,15 @@
         }
     });
 
-    // 綁定點擊頁面其他地方時隱藏搜尋建議
+    // 綁定點擊頁面其他地方時隱藏搜尋建議或取消搜尋
     document.addEventListener('click', (e) => {
-        if (!searchInput.parentElement.contains(e.target)) {
-            searchResultsList.classList.add('hidden');
+        if (!searchContainer.contains(e.target)) {
+            // 如果點擊的地方不在搜尋容器內
+            if (header.classList.contains('search-active')) {
+                deactivateSearch();
+            } else {
+                searchResultsList.classList.add('hidden');
+            }
         }
     });
     
@@ -437,16 +483,17 @@
                 const listItem = document.createElement('div');
                 listItem.classList.add('px-4', 'py-3', 'cursor-pointer', 'hover:bg-gray-700', 'border-b', 'border-gray-700');
 
-                const titleHtml = `<div class="font-bold text-base text-gray-100 truncate">${item.title}</div>`;
+                const titleHtml = `<div class="font-bold text-base text-gray-100 whitespace-normal">${item.title}</div>`;
                 const metaHtml = `
-                    <div class="text-xs text-gray-400 mt-1">
-                        <span><i class="fas fa-book-open w-4 mr-1 text-indigo-400"></i>${item.system || ''}</span>
-                        <span class="ml-2"><i class="fas fa-user-tie w-4 mr-1 text-indigo-400"></i>${item.master || ''}</span>
+                    <div class="text-sm text-gray-400 mt-2 space-y-1">
+                        <div><strong>系統 (英文名):</strong> ${item.system_raw || 'N/A'}</div>
+                        <div><strong>主持人:</strong> ${item.master || 'N/A'}</div>
                     </div>
                 `;
-                const tagsHtml = `<div class="text-xs text-gray-500 mt-1 truncate">Tags: ${item.tags.join(', ')}</div>`;
+                const quoteHtml = `<p class="text-sm text-gray-500 italic mt-2 whitespace-normal">"${item.quote}"</p>`;
 
-                listItem.innerHTML = titleHtml + metaHtml + tagsHtml;
+                listItem.innerHTML = titleHtml + metaHtml + quoteHtml;
+
 
                 listItem.addEventListener('click', () => {
                     searchInput.value = item.title;
