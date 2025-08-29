@@ -430,7 +430,7 @@
         // 標籤
         modalTags.innerHTML = ''; // 清空舊標籤
         if (item.tags && item.tags.length > 0) {
-            const tagsHtml = item.tags.map(tag => `<span class="bg-gray-700 text-gray-300 text-xs font-semibold rounded-full inline-flex items-center justify-center h-6 px-3">${tag}</span>`).join('');
+            const tagsHtml = item.tags.map(tag => `<span class="bg-gray-700 text-gray-300 text-xs font-semibold px-3 py-1 rounded-full">${tag}</span>`).join('');
             modalTags.innerHTML = tagsHtml;
         }
 
@@ -505,11 +505,20 @@
                 useCORS: true,
                 backgroundColor: '#1f2937',
                 ignoreElements: (element) => element.classList.contains('screenshot-ignore'),
-                onclone: (document) => {
-                    const clonedModalContent = document.querySelector('#modal .bg-gray-800');
+                onclone: (clonedDoc) => {
+                    const clonedModalContent = clonedDoc.querySelector('#modal .bg-gray-800');
                     clonedModalContent.style.maxHeight = 'none';
                     const clonedScrollable = clonedModalContent.querySelector('.scroll-container');
                     clonedScrollable.style.overflowY = 'visible';
+
+                    // 修正 Tag 對齊
+                    const tags = clonedDoc.querySelectorAll('#modal-tags span');
+                    tags.forEach(tag => {
+                        tag.style.height = '24px';
+                        tag.style.lineHeight = '24px';
+                        tag.style.paddingTop = '0';
+                        tag.style.paddingBottom = '0';
+                    });
                 }
             });
 
