@@ -182,7 +182,7 @@
             </div>
 
             <!-- 標籤欄 -->
-            <div id="modal-tags" class="flex flex-wrap gap-2 mb-6">
+            <div id="modal-tags" class="flex flex-wrap gap-2 mb-6 screenshot-ignore">
                 <!-- 內容由 JS 動態生成 -->
             </div>
 
@@ -505,21 +505,11 @@
                 useCORS: true,
                 backgroundColor: '#1f2937',
                 ignoreElements: (element) => element.classList.contains('screenshot-ignore'),
-                onclone: (clonedDoc) => {
-                    const clonedModalContent = clonedDoc.querySelector('#modal .bg-gray-800');
+                onclone: (document) => {
+                    const clonedModalContent = document.querySelector('#modal .bg-gray-800');
                     clonedModalContent.style.maxHeight = 'none';
                     const clonedScrollable = clonedModalContent.querySelector('.scroll-container');
                     clonedScrollable.style.overflowY = 'visible';
-
-                    // 修正 Tag 對齊與背景
-                    const tags = clonedDoc.querySelectorAll('#modal-tags span');
-                    tags.forEach(tag => {
-                        tag.style.display = 'inline-block';
-                        tag.style.height = '24px';
-                        tag.style.lineHeight = '24px';
-                        tag.style.padding = '0 12px';
-                        tag.style.textAlign = 'center';
-                    });
                 }
             });
 
