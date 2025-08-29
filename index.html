@@ -430,7 +430,7 @@
         // 標籤
         modalTags.innerHTML = ''; // 清空舊標籤
         if (item.tags && item.tags.length > 0) {
-            const tagsHtml = item.tags.map(tag => `<span class="bg-gray-700 text-gray-300 text-xs font-semibold px-3 py-1 rounded-full">${tag}</span>`).join('');
+            const tagsHtml = item.tags.map(tag => `<span class="bg-gray-700 text-gray-300 text-xs font-semibold rounded-full inline-flex items-center justify-center h-6 px-3">${tag}</span>`).join('');
             modalTags.innerHTML = tagsHtml;
         }
 
