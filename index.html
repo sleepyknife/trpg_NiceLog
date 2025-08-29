@@ -203,6 +203,34 @@
     </div>
 </div>
 
+<!-- 截圖預覽對話框 -->
+<div id="screenshot-preview-modal" class="hidden fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center p-4 z-[10000] transition-opacity duration-300">
+    <div class="bg-gray-800 rounded-3xl shadow-2xl overflow-hidden max-w-4xl w-full max-h-[95vh] flex flex-col relative">
+        <!-- 標題與關閉按鈕 -->
+        <div class="flex justify-between items-center p-4 border-b border-gray-700">
+            <h3 class="text-xl font-bold text-gray-100">截圖預覽</h3>
+            <button id="preview-close-btn" class="text-gray-400 hover:text-gray-100 transition-colors text-2xl">
+                <i class="fas fa-times-circle"></i>
+            </button>
+        </div>
+
+        <!-- 圖片預覽 -->
+        <div class="p-4 flex-grow overflow-auto">
+            <img id="screenshot-preview-image" src="" alt="Screenshot Preview" class="max-w-full h-auto mx-auto">
+        </div>
+
+        <!-- 操作按鈕 -->
+        <div class="p-4 bg-gray-900 flex justify-end space-x-4">
+            <button id="preview-download-btn" class="bg-indigo-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-indigo-700 transition-colors">
+                <i class="fas fa-download mr-2"></i> 下載
+            </button>
+            <button id="preview-cancel-btn" class="bg-gray-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-700 transition-colors">
+                取消
+            </button>
+        </div>
+    </div>
+</div>
+
 
 <footer class="bg-gray-900 mt-16 py-8">
     <div class="container mx-auto px-4 text-center text-gray-500">
@@ -455,74 +483,80 @@
 
     // --- 分享截圖功能 ---
     const shareBtn = document.getElementById('share-btn');
+    const previewModal = document.getElementById('screenshot-preview-modal');
+    const previewImage = document.getElementById('screenshot-preview-image');
+    const previewDownloadBtn = document.getElementById('preview-download-btn');
+    const previewCloseBtn = document.getElementById('preview-close-btn');
+    const previewCancelBtn = document.getElementById('preview-cancel-btn');
+
+    let generatedImageURL = '';
 
     async function shareScreenshot() {
         try {
             const modalContent = document.querySelector('#modal .bg-gray-800');
+            const scrollableContent = modalContent.querySelector('.scroll-container');
+
+            // 暫時調整樣式以擷取完整內容
+            const originalMaxHeight = modalContent.style.maxHeight;
+            const originalOverflow = scrollableContent.style.overflowY;
+            modalContent.style.maxHeight = 'none';
+            scrollableContent.style.overflowY = 'visible';
+
             const canvas = await html2canvas(modalContent, {
                 useCORS: true,
                 backgroundColor: '#1f2937', // bg-gray-800
                 onclone: (document) => {
-                    // 確保在截圖時關閉按鈕是可見的
-                    const closeButton = document.querySelector('#modal-close-btn');
-                    if (closeButton) {
-                        closeButton.style.visibility = 'visible';
-                    }
+                    const clonedModalContent = document.querySelector('#modal .bg-gray-800');
+                    clonedModalContent.style.maxHeight = 'none';
+                    const clonedScrollable = clonedModalContent.querySelector('.scroll-container');
+                    clonedScrollable.style.overflowY = 'visible';
                 }
             });
+
+            // 還原樣式
+            modalContent.style.maxHeight = originalMaxHeight;
+            scrollableContent.style.overflowY = originalOverflow;
 
             // 創建一個新的 canvas 來加上簽名
             const finalCanvas = document.createElement('canvas');
             const ctx = finalCanvas.getContext('2d');
 
-            const signatureHeight = 60; // 簽名區域高度
-            const padding = 20; // 邊距
+            const signatureHeight = 60;
+            const padding = 20;
 
             finalCanvas.width = canvas.width;
             finalCanvas.height = canvas.height + signatureHeight;
 
-            // 填充背景色
             ctx.fillStyle = '#111827'; // bg-gray-900
             ctx.fillRect(0, 0, finalCanvas.width, finalCanvas.height);
-
-            // 繪製原始截圖
             ctx.drawImage(canvas, 0, 0);
-
-            // 繪製簽名區域的背景
             ctx.fillStyle = '#1f2937'; // bg-gray-800
             ctx.fillRect(0, canvas.height, finalCanvas.width, signatureHeight);
 
-            // 載入網站 icon
             const icon = new Image();
-            icon.crossOrigin = "anonymous"; // 處理 CORS
+            icon.crossOrigin = "anonymous";
             icon.src = 'img/favicon-32x32.png';
 
             icon.onload = () => {
-                // 繪製 icon
                 const iconSize = 32;
                 ctx.drawImage(icon, padding, canvas.height + (signatureHeight - iconSize) / 2, iconSize, iconSize);
 
-                // 繪製網站標題
                 ctx.fillStyle = '#e5e7eb'; // text-gray-200
                 ctx.font = 'bold 18px "Inter", sans-serif';
                 ctx.textAlign = 'left';
                 ctx.textBaseline = 'middle';
                 ctx.fillText('說書人的爐邊夜話', padding + iconSize + 10, canvas.height + signatureHeight / 2);
 
-                // 下載圖片
-                const link = document.createElement('a');
-                link.download = `爐邊夜話-${modalTitle.textContent}.png`;
-                link.href = finalCanvas.toDataURL('image/png');
-                link.click();
+                generatedImageURL = finalCanvas.toDataURL('image/png');
+                previewImage.src = generatedImageURL;
+                previewModal.classList.remove('hidden');
             };
 
             icon.onerror = () => {
                 console.error("無法載入 icon，將不包含簽名。");
-                // 如果 icon 載入失敗，直接下載原始截圖
-                const link = document.createElement('a');
-                link.download = `爐邊夜話-${modalTitle.textContent}.png`;
-                link.href = canvas.toDataURL('image/png');
-                link.click();
+                generatedImageURL = canvas.toDataURL('image/png');
+                previewImage.src = generatedImageURL;
+                previewModal.classList.remove('hidden');
             }
 
         } catch (error) {
@@ -532,6 +566,25 @@
     }
 
     shareBtn.addEventListener('click', shareScreenshot);
+
+    function closePreviewModal() {
+        previewModal.classList.add('hidden');
+        previewImage.src = '';
+        generatedImageURL = '';
+    }
+
+    previewCloseBtn.addEventListener('click', closePreviewModal);
+    previewCancelBtn.addEventListener('click', closePreviewModal);
+
+    previewDownloadBtn.addEventListener('click', () => {
+        if (generatedImageURL) {
+            const link = document.createElement('a');
+            link.download = `爐邊夜話-${modalTitle.textContent}.png`;
+            link.href = generatedImageURL;
+            link.click();
+            closePreviewModal();
+        }
+    });
 
     // --- 搜尋標籤與篩選邏輯 ---
 
