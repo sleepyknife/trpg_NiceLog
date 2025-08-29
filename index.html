@@ -195,7 +195,7 @@
         </div>
 
         <!-- 新增分享截圖按鈕 -->
-        <div class="p-6 bg-gray-900 screenshot-ignore">
+        <div id="share-button-container" class="p-6 bg-gray-900 screenshot-ignore">
             <button id="share-btn" class="w-full bg-indigo-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-indigo-700 transition-colors">
                 <i class="fas fa-camera-retro mr-2"></i> 分享截圖
             </button>
@@ -414,6 +414,7 @@
         // 確保 meta 和 tags 可見
         modalMeta.style.display = 'block';
         modalTags.style.display = 'block';
+        document.getElementById('share-button-container').style.display = 'block';
 
         // 基本資訊
         modalTitle.textContent = item.title;
@@ -458,6 +459,7 @@
         // 隱藏 meta 和 tags
         modalMeta.style.display = 'none';
         modalTags.style.display = 'none';
+        document.getElementById('share-button-container').style.display = 'none';
 
         modal.classList.remove('hidden');
     }
@@ -505,8 +507,8 @@
                 useCORS: true,
                 backgroundColor: '#1f2937',
                 ignoreElements: (element) => element.classList.contains('screenshot-ignore'),
-                onclone: (document) => {
-                    const clonedModalContent = document.querySelector('#modal .bg-gray-800');
+                onclone: (clonedDoc) => {
+                    const clonedModalContent = clonedDoc.querySelector('#modal .bg-gray-800');
                     clonedModalContent.style.maxHeight = 'none';
                     const clonedScrollable = clonedModalContent.querySelector('.scroll-container');
                     clonedScrollable.style.overflowY = 'visible';
