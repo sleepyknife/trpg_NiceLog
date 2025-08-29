@@ -81,12 +81,17 @@
             <span class="hidden sm:inline text-3xl font-bold text-gray-100">說書人的爐邊夜話</span>
         </div>
         <div class="flex items-center justify-end flex-grow">
-            <div id="search-container" class="relative mr-2 sm:mr-6">
-                <input type="text" placeholder="搜尋 系統/主持人/tag" class="pl-10 pr-10 py-2 rounded-full bg-gray-800 text-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all w-full" id="search-input">
-                <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                <button id="search-cancel-btn" class="hidden sm:hidden absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white">
-                    <i class="fas fa-times-circle"></i>
-                </button>
+            <div id="search-container" class="relative mr-2 sm:mr-6 w-full sm:w-auto">
+                <div class="relative flex items-center w-full bg-gray-800 rounded-full focus-within:ring-2 focus-within:ring-indigo-500">
+                    <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                    <div id="search-tags-input-container" class="flex items-center gap-2 pl-10 pr-4 py-1 w-full">
+                        <!-- 搜尋關鍵字標籤 -->
+                    </div>
+                    <input type="text" placeholder="搜尋或新增標籤..." class="bg-transparent text-gray-200 focus:outline-none flex-grow min-w-[100px]" id="search-input">
+                    <button id="search-cancel-btn" class="hidden sm:hidden absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white">
+                        <i class="fas fa-times-circle"></i>
+                    </button>
+                </div>
                 <!-- Search Suggestion List -->
                 <div id="search-results-list" class="absolute top-full left-0 mt-2 w-full max-h-[70vh] overflow-y-auto bg-gray-800 rounded-lg shadow-xl hidden"></div>
             </div>
@@ -134,14 +139,19 @@
         <h2 class="text-4xl font-bold text-center text-gray-100 mb-12">探索更多故事</h2>
         
         <!-- 篩選器與排序 (未實作完整功能，僅為UI) -->
-        <div class="flex flex-wrap justify-center sm:justify-end items-center mb-8 gap-4">
-            <span class="text-gray-400 text-sm">篩選：</span>
-            <button class="px-4 py-2 rounded-full bg-gray-800 text-gray-400 text-sm hover:bg-indigo-500 hover:text-white transition-colors">所有</button>
-            <button class="px-4 py-2 rounded-full bg-gray-800 text-gray-400 text-sm hover:bg-indigo-500 hover:text-white transition-colors">奇幻</button>
-            <button class="px-4 py-2 rounded-full bg-gray-800 text-gray-400 text-sm hover:bg-indigo-500 hover:text-white transition-colors">懸疑</button>
-            <button class="px-4 py-2 rounded-full bg-gray-800 text-gray-400 text-sm hover:bg-indigo-500 hover:text-white transition-colors">科幻</button>
+        <div id="filter-container" class="flex flex-wrap justify-center sm:justify-end items-center mb-8 gap-4">
+            <span class="text-gray-400 text-sm">快速篩選：</span>
+            <button data-tag="克蘇魯" class="filter-btn px-4 py-2 rounded-full bg-gray-800 text-gray-400 text-sm hover:bg-indigo-500 hover:text-white transition-colors">克蘇魯</button>
+            <button data-tag="D&D" class="filter-btn px-4 py-2 rounded-full bg-gray-800 text-gray-400 text-sm hover:bg-indigo-500 hover:text-white transition-colors">D&D</button>
+            <button data-tag="奇幻" class="filter-btn px-4 py-2 rounded-full bg-gray-800 text-gray-400 text-sm hover:bg-indigo-500 hover:text-white transition-colors">奇幻</button>
+            <button data-tag="懸疑" class="filter-btn px-4 py-2 rounded-full bg-gray-800 text-gray-400 text-sm hover:bg-indigo-500 hover:text-white transition-colors">懸疑</button>
+            <button data-tag="科幻" class="filter-btn px-4 py-2 rounded-full bg-gray-800 text-gray-400 text-sm hover:bg-indigo-500 hover:text-white transition-colors">科幻</button>
+            <button data-tag="搞笑" class="filter-btn px-4 py-2 rounded-full bg-gray-800 text-gray-400 text-sm hover:bg-indigo-500 hover:text-white transition-colors">搞笑</button>
+        </div>
+
+        <div class="text-center mb-8">
             <button id="clear-search-btn" class="hidden px-4 py-2 rounded-full bg-red-600 text-white text-sm hover:bg-red-500 transition-colors">
-                <i class="fas fa-times-circle mr-2"></i>清空搜尋
+                <i class="fas fa-times-circle mr-2"></i>清空所有搜尋
             </button>
         </div>
 
@@ -206,6 +216,7 @@
     let trpgData = []; // 存放從 JSON 讀取的資料
     let carouselItems = []; // 存放固定的輪播項目
     let prevIndex = -1; // 用於判斷滑動方向
+    let searchTags = []; // 用於存放搜尋標籤
 
     // Modal 相關元素
     const modal = document.getElementById('modal');
@@ -425,6 +436,89 @@
         showAboutUsModal();
     });
 
+    // --- 搜尋標籤與篩選邏輯 ---
+
+    function renderSearchTags() {
+        const tagsContainer = document.getElementById('search-tags-input-container');
+        tagsContainer.innerHTML = ''; // 清空現有標籤
+        searchTags.forEach(tag => {
+            const tagElement = document.createElement('div');
+            tagElement.classList.add('flex', 'items-center', 'bg-indigo-500', 'text-white', 'text-sm', 'font-semibold', 'px-3', 'py-1', 'rounded-full', 'gap-2');
+            tagElement.innerHTML = `
+                <span>${tag}</span>
+                <button class="text-white hover:text-gray-200 focus:outline-none">&times;</button>
+            `;
+            tagElement.querySelector('button').addEventListener('click', () => {
+                removeSearchTag(tag);
+            });
+            tagsContainer.appendChild(tagElement);
+        });
+
+        // 重新聚焦到輸入框
+        const inputContainer = document.getElementById('search-tags-input-container');
+        inputContainer.appendChild(searchInput);
+        searchInput.focus();
+    }
+
+    function addSearchTag(tag) {
+        const trimmedTag = tag.trim();
+        if (trimmedTag && !searchTags.includes(trimmedTag)) {
+            searchTags.push(trimmedTag);
+            renderSearchTags();
+            filterAndRenderCards();
+        }
+        searchInput.value = '';
+    }
+
+    function removeSearchTag(tag) {
+        searchTags = searchTags.filter(t => t !== tag);
+        renderSearchTags();
+        filterAndRenderCards();
+    }
+
+    document.getElementById('clear-search-btn').addEventListener('click', clearSearch);
+
+    function filterAndRenderCards() {
+        const searchTerm = searchInput.value.toLowerCase();
+        const clearSearchBtn = document.getElementById('clear-search-btn');
+
+        if (searchTags.length > 0 || searchTerm) {
+            clearSearchBtn.classList.remove('hidden');
+        } else {
+            clearSearchBtn.classList.add('hidden');
+        }
+
+        const filteredData = trpgData.filter(item => {
+            // 檢查所有 searchTags 是否都匹配
+            const tagsMatch = searchTags.every(tag => {
+                const lowerCaseTag = tag.toLowerCase();
+                return item.title.toLowerCase().includes(lowerCaseTag) ||
+                       (item.system && item.system.toLowerCase().includes(lowerCaseTag)) ||
+                       (item.system_raw && item.system_raw.toLowerCase().includes(lowerCaseTag)) ||
+                       (item.master && item.master.toLowerCase().includes(lowerCaseTag)) ||
+                       item.tags.some(t => t.toLowerCase().includes(lowerCaseTag)) ||
+                       item.description.toLowerCase().includes(lowerCaseTag);
+            });
+
+            if (!tagsMatch) return false;
+
+            // 如果輸入框還有文字，則進一步篩選
+            if (searchTerm) {
+                return item.title.toLowerCase().includes(searchTerm) ||
+                       (item.system && item.system.toLowerCase().includes(searchTerm)) ||
+                       (item.system_raw && item.system_raw.toLowerCase().includes(searchTerm)) ||
+                       (item.master && item.master.toLowerCase().includes(searchTerm)) ||
+                       item.tags.some(t => t.toLowerCase().includes(searchTerm)) ||
+                       item.description.toLowerCase().includes(searchTerm);
+            }
+
+            return true;
+        });
+
+        renderCards(filteredData);
+        updateSearchResultsList(filteredData, searchTerm);
+    }
+
     // --- 搜尋啟用/停用邏輯 ---
     function activateSearch() {
         if (window.innerWidth < 640) {
@@ -445,42 +539,35 @@
     searchCancelBtn.addEventListener('click', deactivateSearch);
 
     // 綁定搜尋輸入事件
-    searchInput.addEventListener('input', (e) => {
-        const searchTerm = e.target.value.toLowerCase();
-        const clearSearchBtn = document.getElementById('clear-search-btn');
+    searchInput.addEventListener('input', () => {
+        filterAndRenderCards();
+    });
 
-        if (searchTerm.length > 0) {
-            clearSearchBtn.classList.remove('hidden');
-        } else {
-            clearSearchBtn.classList.add('hidden');
-        }
-
-        const filteredData = trpgData.filter(item => {
-            const titleMatch = item.title.toLowerCase().includes(searchTerm);
-            const quoteMatch = item.quote.toLowerCase().includes(searchTerm);
-            const descriptionMatch = item.description.toLowerCase().includes(searchTerm);
-            const tagsMatch = item.tags.some(tag => tag.toLowerCase().includes(searchTerm));
-            const systemMatch = (item.system || '').toLowerCase().includes(searchTerm);
-            const systemRawMatch = (item.system_raw || '').toLowerCase().includes(searchTerm);
-            const masterMatch = (item.master || '').toLowerCase().includes(searchTerm);
-            return titleMatch || quoteMatch || descriptionMatch || tagsMatch || systemMatch || systemRawMatch || masterMatch;
-        });
-        renderCards(filteredData);
-        updateSearchResultsList(filteredData, searchTerm);
-
-        // 新增：如果搜尋有結果，自動捲動到卡片清單
-        if (filteredData.length > 0 && searchTerm.length > 0) {
-            document.getElementById('archive').scrollIntoView({ behavior: 'smooth' });
+    searchInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && searchInput.value.trim()) {
+            e.preventDefault();
+            addSearchTag(searchInput.value);
+        } else if (e.key === 'Backspace' && searchInput.value === '' && searchTags.length > 0) {
+            // 當輸入框為空且按下 Backspace 時，移除最後一個標籤
+            removeSearchTag(searchTags[searchTags.length - 1]);
         }
     });
 
-    // 清空搜尋按鈕功能
-    document.getElementById('clear-search-btn').addEventListener('click', () => {
+    // 綁定快速篩選按鈕
+    document.getElementById('filter-container').addEventListener('click', (e) => {
+        if (e.target.classList.contains('filter-btn')) {
+            const tag = e.target.dataset.tag;
+            addSearchTag(tag);
+        }
+    });
+
+    // 清空搜尋功能
+    function clearSearch() {
+        searchTags = [];
         searchInput.value = '';
-        renderCards(trpgData);
-        searchResultsList.classList.add('hidden');
-        document.getElementById('clear-search-btn').classList.add('hidden');
-    });
+        renderSearchTags();
+        filterAndRenderCards();
+    }
 
     // 綁定點擊頁面其他地方時隱藏搜尋建議或取消搜尋
     document.addEventListener('click', (e) => {
