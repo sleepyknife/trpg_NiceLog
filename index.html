@@ -514,11 +514,11 @@
                     // 修正 Tag 對齊與背景
                     const tags = clonedDoc.querySelectorAll('#modal-tags span');
                     tags.forEach(tag => {
-                        tag.style.display = 'inline-flex';
-                        tag.style.alignItems = 'center';
-                        tag.style.justifyContent = 'center';
+                        tag.style.display = 'inline-block';
                         tag.style.height = '24px';
+                        tag.style.lineHeight = '24px';
                         tag.style.padding = '0 12px';
+                        tag.style.textAlign = 'center';
                     });
                 }
             });
