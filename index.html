@@ -12,6 +12,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -191,6 +192,13 @@
             <div id="modal-description" class="text-base text-gray-300 leading-relaxed prose prose-invert max-w-none">
                 <!-- 內容由 JS 動態生成 -->
             </div>
+        </div>
+
+        <!-- 新增分享截圖按鈕 -->
+        <div class="p-6 bg-gray-900">
+            <button id="share-btn" class="w-full bg-indigo-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-indigo-700 transition-colors">
+                <i class="fas fa-camera-retro mr-2"></i> 分享截圖
+            </button>
         </div>
     </div>
 </div>
@@ -444,6 +452,86 @@
         e.preventDefault();
         showAboutUsModal();
     });
+
+    // --- 分享截圖功能 ---
+    const shareBtn = document.getElementById('share-btn');
+
+    async function shareScreenshot() {
+        try {
+            const modalContent = document.querySelector('#modal .bg-gray-800');
+            const canvas = await html2canvas(modalContent, {
+                useCORS: true,
+                backgroundColor: '#1f2937', // bg-gray-800
+                onclone: (document) => {
+                    // 確保在截圖時關閉按鈕是可見的
+                    const closeButton = document.querySelector('#modal-close-btn');
+                    if (closeButton) {
+                        closeButton.style.visibility = 'visible';
+                    }
+                }
+            });
+
+            // 創建一個新的 canvas 來加上簽名
+            const finalCanvas = document.createElement('canvas');
+            const ctx = finalCanvas.getContext('2d');
+
+            const signatureHeight = 60; // 簽名區域高度
+            const padding = 20; // 邊距
+
+            finalCanvas.width = canvas.width;
+            finalCanvas.height = canvas.height + signatureHeight;
+
+            // 填充背景色
+            ctx.fillStyle = '#111827'; // bg-gray-900
+            ctx.fillRect(0, 0, finalCanvas.width, finalCanvas.height);
+
+            // 繪製原始截圖
+            ctx.drawImage(canvas, 0, 0);
+
+            // 繪製簽名區域的背景
+            ctx.fillStyle = '#1f2937'; // bg-gray-800
+            ctx.fillRect(0, canvas.height, finalCanvas.width, signatureHeight);
+
+            // 載入網站 icon
+            const icon = new Image();
+            icon.crossOrigin = "anonymous"; // 處理 CORS
+            icon.src = 'img/favicon-32x32.png';
+
+            icon.onload = () => {
+                // 繪製 icon
+                const iconSize = 32;
+                ctx.drawImage(icon, padding, canvas.height + (signatureHeight - iconSize) / 2, iconSize, iconSize);
+
+                // 繪製網站標題
+                ctx.fillStyle = '#e5e7eb'; // text-gray-200
+                ctx.font = 'bold 18px "Inter", sans-serif';
+                ctx.textAlign = 'left';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('說書人的爐邊夜話', padding + iconSize + 10, canvas.height + signatureHeight / 2);
+
+                // 下載圖片
+                const link = document.createElement('a');
+                link.download = `爐邊夜話-${modalTitle.textContent}.png`;
+                link.href = finalCanvas.toDataURL('image/png');
+                link.click();
+            };
+
+            icon.onerror = () => {
+                console.error("無法載入 icon，將不包含簽名。");
+                // 如果 icon 載入失敗，直接下載原始截圖
+                const link = document.createElement('a');
+                link.download = `爐邊夜話-${modalTitle.textContent}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            }
+
+        } catch (error) {
+            console.error('截圖失敗:', error);
+            alert('抱歉，截圖功能發生錯誤，請稍後再試。');
+        }
+    }
+
+    shareBtn.addEventListener('click', shareScreenshot);
 
     // --- 搜尋標籤與篩選邏輯 ---
 
