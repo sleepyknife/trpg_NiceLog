@@ -167,7 +167,7 @@
 <div id="modal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-[9999] transition-opacity duration-300">
     <div class="bg-gray-800 text-gray-200 rounded-3xl shadow-2xl overflow-hidden max-w-2xl w-full max-h-[90vh] flex flex-col relative">
         <!-- 關閉按鈕 -->
-        <button id="modal-close-btn" class="absolute top-4 right-4 text-gray-400 hover:text-gray-100 transition-colors text-2xl z-10">
+        <button id="modal-close-btn" class="absolute top-4 right-4 text-gray-400 hover:text-gray-100 transition-colors text-2xl z-10 screenshot-ignore">
             <i class="fas fa-times-circle"></i>
         </button>
 
@@ -195,7 +195,7 @@
         </div>
 
         <!-- 新增分享截圖按鈕 -->
-        <div class="p-6 bg-gray-900">
+        <div class="p-6 bg-gray-900 screenshot-ignore">
             <button id="share-btn" class="w-full bg-indigo-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-indigo-700 transition-colors">
                 <i class="fas fa-camera-retro mr-2"></i> 分享截圖
             </button>
@@ -496,7 +496,6 @@
             const modalContent = document.querySelector('#modal .bg-gray-800');
             const scrollableContent = modalContent.querySelector('.scroll-container');
 
-            // 暫時調整樣式以擷取完整內容
             const originalMaxHeight = modalContent.style.maxHeight;
             const originalOverflow = scrollableContent.style.overflowY;
             modalContent.style.maxHeight = 'none';
@@ -504,7 +503,8 @@
 
             const canvas = await html2canvas(modalContent, {
                 useCORS: true,
-                backgroundColor: '#1f2937', // bg-gray-800
+                backgroundColor: '#1f2937',
+                ignoreElements: (element) => element.classList.contains('screenshot-ignore'),
                 onclone: (document) => {
                     const clonedModalContent = document.querySelector('#modal .bg-gray-800');
                     clonedModalContent.style.maxHeight = 'none';
@@ -513,24 +513,22 @@
                 }
             });
 
-            // 還原樣式
             modalContent.style.maxHeight = originalMaxHeight;
             scrollableContent.style.overflowY = originalOverflow;
 
-            // 創建一個新的 canvas 來加上簽名
             const finalCanvas = document.createElement('canvas');
             const ctx = finalCanvas.getContext('2d');
 
-            const signatureHeight = 60;
-            const padding = 20;
+            const signatureHeight = 80; // 增加簽名區域高度
+            const padding = 25; // 增加邊距
 
             finalCanvas.width = canvas.width;
             finalCanvas.height = canvas.height + signatureHeight;
 
-            ctx.fillStyle = '#111827'; // bg-gray-900
+            ctx.fillStyle = '#111827';
             ctx.fillRect(0, 0, finalCanvas.width, finalCanvas.height);
             ctx.drawImage(canvas, 0, 0);
-            ctx.fillStyle = '#1f2937'; // bg-gray-800
+            ctx.fillStyle = '#1f2937';
             ctx.fillRect(0, canvas.height, finalCanvas.width, signatureHeight);
 
             const icon = new Image();
@@ -538,14 +536,14 @@
             icon.src = 'img/favicon-32x32.png';
 
             icon.onload = () => {
-                const iconSize = 32;
+                const iconSize = 48; // 增加 icon 大小
                 ctx.drawImage(icon, padding, canvas.height + (signatureHeight - iconSize) / 2, iconSize, iconSize);
 
-                ctx.fillStyle = '#e5e7eb'; // text-gray-200
-                ctx.font = 'bold 18px "Inter", sans-serif';
+                ctx.fillStyle = '#e5e7eb';
+                ctx.font = 'bold 24px "Inter", sans-serif'; // 增加字體大小
                 ctx.textAlign = 'left';
                 ctx.textBaseline = 'middle';
-                ctx.fillText('說書人的爐邊夜話', padding + iconSize + 10, canvas.height + signatureHeight / 2);
+                ctx.fillText('說書人的爐邊夜話', padding + iconSize + 15, canvas.height + signatureHeight / 2);
 
                 generatedImageURL = finalCanvas.toDataURL('image/png');
                 previewImage.src = generatedImageURL;
