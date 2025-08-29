@@ -375,6 +375,10 @@
 
     // 顯示對話框並填入內容
     function showModal(item) {
+        // 確保 meta 和 tags 可見
+        modalMeta.style.display = 'block';
+        modalTags.style.display = 'block';
+
         // 基本資訊
         modalTitle.textContent = item.title;
 
@@ -414,6 +418,11 @@
         modalTitle.textContent = aboutUsContent.title;
         modalDescription.innerHTML = aboutUsContent.description; // 優化：使用 innerHTML 並改為 HTML 內容
         modalImage.style.backgroundImage = `url('img/${aboutUsContent.image}')`;
+
+        // 隱藏 meta 和 tags
+        modalMeta.style.display = 'none';
+        modalTags.style.display = 'none';
+
         modal.classList.remove('hidden');
     }
 
