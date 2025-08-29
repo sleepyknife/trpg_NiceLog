@@ -57,9 +57,18 @@
 
         /* 搜尋優化 */
         @media (max-width: 639px) {
+            #header.search-active #logo-title-container,
+            #header.search-active #main-nav {
+                display: none;
+            }
+
             #header.search-active #search-container {
                 width: 100%;
                 flex-grow: 1;
+            }
+
+            #header.search-active #search-cancel-btn {
+                display: block;
             }
         }
     </style>
@@ -239,8 +248,6 @@
     const header = document.getElementById('header');
     const searchContainer = document.getElementById('search-container');
     const searchCancelBtn = document.getElementById('search-cancel-btn');
-    const logoTitleContainer = document.getElementById('logo-title-container');
-    const mainNav = document.getElementById('main-nav');
     let currentIndex = 0;
     let intervalId;
     let trpgData = []; // 存放從 JSON 讀取的資料
@@ -665,18 +672,12 @@
 
     // --- 搜尋啟用/停用邏輯 ---
     function activateSearch() {
-        if (window.innerWidth < 640) {
-            header.classList.add('search-active');
-            logoTitleContainer.classList.add('hidden');
-            mainNav.classList.add('hidden');
-            searchCancelBtn.classList.remove('hidden');
-        }
+        header.classList.add('search-active');
+        searchCancelBtn.classList.remove('hidden');
     }
 
     function deactivateSearch() {
         header.classList.remove('search-active');
-        logoTitleContainer.classList.remove('hidden');
-        mainNav.classList.remove('hidden');
         searchCancelBtn.classList.add('hidden');
         searchInput.value = '';
         searchResultsList.classList.add('hidden');
