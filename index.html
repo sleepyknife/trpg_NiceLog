@@ -12,6 +12,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -166,7 +167,7 @@
 <div id="modal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-[9999] transition-opacity duration-300">
     <div class="bg-gray-800 text-gray-200 rounded-3xl shadow-2xl overflow-hidden max-w-2xl w-full max-h-[90vh] flex flex-col relative">
         <!-- 關閉按鈕 -->
-        <button id="modal-close-btn" class="absolute top-4 right-4 text-gray-400 hover:text-gray-100 transition-colors text-2xl z-10">
+        <button id="modal-close-btn" class="absolute top-4 right-4 text-gray-400 hover:text-gray-100 transition-colors text-2xl z-10 screenshot-ignore">
             <i class="fas fa-times-circle"></i>
         </button>
 
@@ -181,7 +182,7 @@
             </div>
 
             <!-- 標籤欄 -->
-            <div id="modal-tags" class="flex flex-wrap gap-2 mb-6">
+            <div id="modal-tags" class="flex flex-wrap gap-2 mb-6 screenshot-ignore">
                 <!-- 內容由 JS 動態生成 -->
             </div>
 
@@ -191,6 +192,41 @@
             <div id="modal-description" class="text-base text-gray-300 leading-relaxed prose prose-invert max-w-none">
                 <!-- 內容由 JS 動態生成 -->
             </div>
+        </div>
+
+        <!-- 新增分享截圖按鈕 -->
+        <div id="share-button-container" class="p-6 bg-gray-900 screenshot-ignore">
+            <button id="share-btn" class="w-full bg-indigo-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-indigo-700 transition-colors">
+                <i class="fas fa-camera-retro mr-2"></i> 分享截圖
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- 截圖預覽對話框 -->
+<div id="screenshot-preview-modal" class="hidden fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center p-4 z-[10000] transition-opacity duration-300">
+    <div class="bg-gray-800 rounded-3xl shadow-2xl overflow-hidden max-w-4xl w-full max-h-[95vh] flex flex-col relative">
+        <!-- 標題與關閉按鈕 -->
+        <div class="flex justify-between items-center p-4 border-b border-gray-700">
+            <h3 class="text-xl font-bold text-gray-100">截圖預覽</h3>
+            <button id="preview-close-btn" class="text-gray-400 hover:text-gray-100 transition-colors text-2xl">
+                <i class="fas fa-times-circle"></i>
+            </button>
+        </div>
+
+        <!-- 圖片預覽 -->
+        <div class="p-4 flex-grow overflow-auto">
+            <img id="screenshot-preview-image" src="" alt="Screenshot Preview" class="max-w-full h-auto mx-auto">
+        </div>
+
+        <!-- 操作按鈕 -->
+        <div class="p-4 bg-gray-900 flex justify-end space-x-4">
+            <button id="preview-download-btn" class="bg-indigo-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-indigo-700 transition-colors">
+                <i class="fas fa-download mr-2"></i> 下載
+            </button>
+            <button id="preview-cancel-btn" class="bg-gray-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-700 transition-colors">
+                取消
+            </button>
         </div>
     </div>
 </div>
@@ -378,6 +414,7 @@
         // 確保 meta 和 tags 可見
         modalMeta.style.display = 'block';
         modalTags.style.display = 'block';
+        document.getElementById('share-button-container').style.display = 'block';
 
         // 基本資訊
         modalTitle.textContent = item.title;
@@ -422,6 +459,7 @@
         // 隱藏 meta 和 tags
         modalMeta.style.display = 'none';
         modalTags.style.display = 'none';
+        document.getElementById('share-button-container').style.display = 'none';
 
         modal.classList.remove('hidden');
     }
@@ -443,6 +481,109 @@
     aboutUsBtn.addEventListener('click', (e) => {
         e.preventDefault();
         showAboutUsModal();
+    });
+
+    // --- 分享截圖功能 ---
+    const shareBtn = document.getElementById('share-btn');
+    const previewModal = document.getElementById('screenshot-preview-modal');
+    const previewImage = document.getElementById('screenshot-preview-image');
+    const previewDownloadBtn = document.getElementById('preview-download-btn');
+    const previewCloseBtn = document.getElementById('preview-close-btn');
+    const previewCancelBtn = document.getElementById('preview-cancel-btn');
+
+    let generatedImageURL = '';
+
+    async function shareScreenshot() {
+        try {
+            const modalContent = document.querySelector('#modal .bg-gray-800');
+            const scrollableContent = modalContent.querySelector('.scroll-container');
+
+            const originalMaxHeight = modalContent.style.maxHeight;
+            const originalOverflow = scrollableContent.style.overflowY;
+            modalContent.style.maxHeight = 'none';
+            scrollableContent.style.overflowY = 'visible';
+
+            const canvas = await html2canvas(modalContent, {
+                useCORS: true,
+                backgroundColor: '#1f2937',
+                ignoreElements: (element) => element.classList.contains('screenshot-ignore'),
+                onclone: (clonedDoc) => {
+                    const clonedModalContent = clonedDoc.querySelector('#modal .bg-gray-800');
+                    clonedModalContent.style.maxHeight = 'none';
+                    const clonedScrollable = clonedModalContent.querySelector('.scroll-container');
+                    clonedScrollable.style.overflowY = 'visible';
+                }
+            });
+
+            modalContent.style.maxHeight = originalMaxHeight;
+            scrollableContent.style.overflowY = originalOverflow;
+
+            const finalCanvas = document.createElement('canvas');
+            const ctx = finalCanvas.getContext('2d');
+
+            const signatureHeight = 80; // 增加簽名區域高度
+            const padding = 25; // 增加邊距
+
+            finalCanvas.width = canvas.width;
+            finalCanvas.height = canvas.height + signatureHeight;
+
+            ctx.fillStyle = '#111827';
+            ctx.fillRect(0, 0, finalCanvas.width, finalCanvas.height);
+            ctx.drawImage(canvas, 0, 0);
+            ctx.fillStyle = '#1f2937';
+            ctx.fillRect(0, canvas.height, finalCanvas.width, signatureHeight);
+
+            const icon = new Image();
+            icon.crossOrigin = "anonymous";
+            icon.src = 'img/favicon-32x32.png';
+
+            icon.onload = () => {
+                const iconSize = 48; // 增加 icon 大小
+                ctx.drawImage(icon, padding, canvas.height + (signatureHeight - iconSize) / 2, iconSize, iconSize);
+
+                ctx.fillStyle = '#e5e7eb';
+                ctx.font = 'bold 24px "Inter", sans-serif'; // 增加字體大小
+                ctx.textAlign = 'left';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('說書人的爐邊夜話', padding + iconSize + 15, canvas.height + signatureHeight / 2);
+
+                generatedImageURL = finalCanvas.toDataURL('image/png');
+                previewImage.src = generatedImageURL;
+                previewModal.classList.remove('hidden');
+            };
+
+            icon.onerror = () => {
+                console.error("無法載入 icon，將不包含簽名。");
+                generatedImageURL = canvas.toDataURL('image/png');
+                previewImage.src = generatedImageURL;
+                previewModal.classList.remove('hidden');
+            }
+
+        } catch (error) {
+            console.error('截圖失敗:', error);
+            alert('抱歉，截圖功能發生錯誤，請稍後再試。');
+        }
+    }
+
+    shareBtn.addEventListener('click', shareScreenshot);
+
+    function closePreviewModal() {
+        previewModal.classList.add('hidden');
+        previewImage.src = '';
+        generatedImageURL = '';
+    }
+
+    previewCloseBtn.addEventListener('click', closePreviewModal);
+    previewCancelBtn.addEventListener('click', closePreviewModal);
+
+    previewDownloadBtn.addEventListener('click', () => {
+        if (generatedImageURL) {
+            const link = document.createElement('a');
+            link.download = `爐邊夜話-${modalTitle.textContent}.png`;
+            link.href = generatedImageURL;
+            link.click();
+            closePreviewModal();
+        }
     });
 
     // --- 搜尋標籤與篩選邏輯 ---
