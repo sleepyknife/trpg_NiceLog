@@ -190,7 +190,7 @@
             <hr class="border-gray-600 mb-6">
 
             <!-- 主題影片 -->
-            <div id="modal-theme-container" class="mb-6"></div>
+            <div id="modal-theme-container" class="mb-6 screenshot-ignore"></div>
 
             <!-- 描述內容 -->
             <div id="modal-description" class="text-base text-gray-300 leading-relaxed prose prose-invert max-w-none">
@@ -492,6 +492,8 @@
     // 隱藏對話框
     function hideModal(updateHistory = true) {
         modal.classList.add('hidden');
+        // 清空影片，防止背景播放
+        modalThemeContainer.innerHTML = '';
         if (updateHistory) {
             // 更新網址，移除 story 參數
             const url = new URL(window.location);
