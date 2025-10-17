@@ -436,7 +436,7 @@
         }
 
         // 描述
-        modalDescription.innerHTML = item.description;
+        modalDescription.innerHTML = item.description.replace(/\n/g, "<br>");
 
         modal.classList.remove('hidden');
     }
