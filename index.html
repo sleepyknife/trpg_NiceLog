@@ -189,6 +189,9 @@
 
             <hr class="border-gray-600 mb-6">
 
+            <!-- 主題影片 -->
+            <div id="modal-theme-container" class="mb-6"></div>
+
             <!-- 描述內容 -->
             <div id="modal-description" class="text-base text-gray-300 leading-relaxed prose prose-invert max-w-none">
                 <!-- 內容由 JS 動態生成 -->
@@ -260,6 +263,7 @@
     const modalTitle = document.getElementById('modal-title');
     const modalDescription = document.getElementById('modal-description');
     const modalImage = document.getElementById('modal-image');
+    const modalThemeContainer = document.getElementById('modal-theme-container');
     const modalMeta = document.getElementById('modal-meta');
     const modalTags = document.getElementById('modal-tags');
     const modalCloseBtn = document.getElementById('modal-close-btn');
@@ -438,6 +442,19 @@
 
         // 描述
         modalDescription.innerHTML = item.description.replace(/\n/g, "<br>");
+
+        // 主題影片
+        if (item.theme) {
+            modalThemeContainer.innerHTML = `
+                <div class="aspect-w-16 aspect-h-9 border border-gray-600 rounded-lg overflow-hidden">
+                    <iframe src="${item.theme}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                </div>
+            `;
+            modalThemeContainer.classList.remove('hidden');
+        } else {
+            modalThemeContainer.innerHTML = '';
+            modalThemeContainer.classList.add('hidden');
+        }
 
         modal.classList.remove('hidden');
 
