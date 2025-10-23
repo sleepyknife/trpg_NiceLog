@@ -546,7 +546,18 @@
 
     async function shareScreenshot() {
         try {
-            const modalContent = document.querySelector('#modal .bg-gray-800');
+            const modalContent = document.querySelector('#modal > div');
+            const modalImage = document.getElementById('modal-image');
+            const imageUrl = window.getComputedStyle(modalImage).backgroundImage.slice(4, -1).replace(/"/g, "");
+
+            // Preload the image to ensure it's in the cache
+            await new Promise((resolve, reject) => {
+                const img = new Image();
+                img.onload = resolve;
+                img.onerror = reject;
+                img.src = imageUrl;
+            });
+
             const scrollableContent = modalContent.querySelector('.scroll-container');
 
             const originalMaxHeight = modalContent.style.maxHeight;
@@ -559,10 +570,14 @@
                 backgroundColor: '#1f2937',
                 ignoreElements: (element) => element.classList.contains('screenshot-ignore'),
                 onclone: (clonedDoc) => {
-                    const clonedModalContent = clonedDoc.querySelector('#modal .bg-gray-800');
-                    clonedModalContent.style.maxHeight = 'none';
-                    const clonedScrollable = clonedModalContent.querySelector('.scroll-container');
-                    clonedScrollable.style.overflowY = 'visible';
+                    const clonedModalContent = clonedDoc.querySelector('#modal > div');
+                    if (clonedModalContent) {
+                        clonedModalContent.style.maxHeight = 'none';
+                        const clonedScrollable = clonedModalContent.querySelector('.scroll-container');
+                        if (clonedScrollable) {
+                            clonedScrollable.style.overflowY = 'visible';
+                        }
+                    }
                 }
             });
 
@@ -585,8 +600,7 @@
             ctx.fillRect(0, canvas.height, finalCanvas.width, signatureHeight);
 
             const icon = new Image();
-            icon.crossOrigin = "anonymous";
-            icon.src = 'img/favicon-32x32.png';
+            icon.src = '/img/favicon-32x32.png';
 
             icon.onload = () => {
                 const iconSize = 48; // 增加 icon 大小
