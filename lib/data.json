@@ -7,6 +7,7 @@
     "theme": "",
     "tags": ["黑暗世界", "木乃伊", "恐怖", "黑歷史"],
     "system": "木乃伊:詛咒二版",
+    "system_link": "https://whitewolf.fandom.com/wiki/Mummy:_The_Curse",
     "system_raw": "Mummy: The Curse Second Edition",
     "eventtime": "不可考",
     "master": "不好說"
@@ -19,6 +20,7 @@
 	"theme": "https://www.youtube.com/watch?v=h3G7rb3NF28",
     "tags": ["龍與地下城", "冒險", "黑歷史"],
     "system": "龍與地下城 五版",
+    "system_link": "https://dnd.wizards.com/",
     "system_raw": "Dungeons & Dragons 5E",
     "eventtime": "不可考",
     "master": "不好說"
@@ -31,6 +33,7 @@
 	"theme": "",
     "tags": ["科幻", "冒險", "電馭叛客", "完結"],
     "system": "電馭叛客：紅色年代",
+    "system_link": "https://rtalsoriangames.com/cyberpunk/",
     "system_raw": "cyberpunk RED",
     "eventtime": "2022/10/24",
     "master": "盧靜"
